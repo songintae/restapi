@@ -23,4 +23,12 @@ public class Event {
     private boolean free;      //price 가격이 없을경우 free
     @Enumerated(value = EnumType.STRING)
     private EventStatus eventType = EventStatus.DRAFT;
+
+    public void update() {
+        if(price == 0)
+            free = true;
+        if(location == null || location.isEmpty())
+            online = true;
+
+    }
 }

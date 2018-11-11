@@ -3,6 +3,8 @@ package restapi.events;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +40,14 @@ public class EventController {
 
         Event event = modelMapper.map(eventDto, Event.class);
         Event savedEvent = eventRepository.save(event);
-        URI uri = linkTo(EventController.class).slash(savedEvent.getId()).toUri();
-        return ResponseEntity.created(uri).body(event);
+        event.update();
+
+        URI locationUri = linkTo(EventController.class).slash(savedEvent.getId()).toUri();
+
+        EventResource eventResource = new EventResource(savedEvent);
+        eventResource.add(linkTo(EventController.class).withRel("events"));
+        eventResource.add(linkTo(EventController.class).slash(savedEvent.getId()).withRel("update"));
+        eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
+        return ResponseEntity.created(locationUri).body(eventResource);
     }
 }
