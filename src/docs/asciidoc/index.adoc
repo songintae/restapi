@@ -88,3 +88,9 @@ include::{snippets}/errors/http-response.adoc[]
 `POST` 요청을 사용해서 새 이벤트를 만들 수 있다.
 
 operation::create-events[snippets='request-fields,curl-request,http-response,links']
+
+[[resources-events-read]]
+=== 이벤트 상세 조회
+'GET' 요청을 사용해서 이벤트 상세 내역을 조회할 수 있다.
+
+operation::read-events[snippets='path-parameters,curl-request,http-response,links']
