@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import restapi.common.RestDocsConfig;
 
 import java.time.LocalDateTime;
+import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
@@ -189,5 +190,24 @@ public class EventControllerTest {
                                 fieldWithPath("online").description("Event 온라인 여부")))
                 )
                 ;
+    }
+
+
+    @Test
+    public void Event_리스트_조회_테스트() throws Exception {
+        // given
+        IntStream.range(0, 20).forEach(idx -> {
+            eventRepository.save(Event.builder().name("Event " + idx).build());
+        });
+
+        // when & then
+        mockMvc.perform(get("/api/events?page={page}&size={size}",0,10))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page.totalElements").value(20))
+                .andExpect(jsonPath("page.size").value(10))
+                .andExpect(jsonPath("page.totalPages").value(2))
+                .andExpect(jsonPath("page.number").value(0))
+                .andExpect(jsonPath("_links").hasJsonPath())
+                .andDo(print());
     }
 }

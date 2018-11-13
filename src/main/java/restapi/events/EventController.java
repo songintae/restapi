@@ -3,8 +3,12 @@ package restapi.events;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -57,5 +61,12 @@ public class EventController {
         eventResource.add(linkTo(EventController.class).withRel("events"));
         eventResource.add(new Link("/docs/index.html#resources-events-read").withRel("profile"));
         return ResponseEntity.ok(eventResource);
+    }
+
+    @GetMapping("")
+    public ResponseEntity events(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
+        Page<Event> page = eventRepository.findAll(pageable);
+        PagedResources<EventResource> pagedResources = assembler.toResource(page, e -> new EventResource(e));
+        return ResponseEntity.ok(pagedResources);
     }
 }
