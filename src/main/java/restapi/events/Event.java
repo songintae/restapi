@@ -1,6 +1,7 @@
 package restapi.events;
 
 import lombok.*;
+import restapi.Account.Account;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -18,11 +19,15 @@ public class Event {
     private String description;
     private String location;
     private int price;
-    private LocalDateTime date;
+    private LocalDateTime date = LocalDateTime.now();
     private boolean online;    //장소 정보가 없을경우 online
     private boolean free;      //price 가격이 없을경우 free
     @Enumerated(value = EnumType.STRING)
     private EventStatus eventType = EventStatus.DRAFT;
+
+    @ManyToOne
+    @JoinColumn(name = "ACCOUNT_ID")
+    private Account publisher;
 
     public void update() {
         if(price == 0)
@@ -30,5 +35,9 @@ public class Event {
         if(location == null || location.isEmpty())
             online = true;
 
+    }
+
+    public boolean isPublisher(Account account) {
+        return publisher.equals(account);
     }
 }

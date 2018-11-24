@@ -15,5 +15,5 @@ public class EventDto {
     @NotEmpty
     private String location;
     private int price;
-    private LocalDateTime date;
+    private LocalDateTime date = LocalDateTime.now();
 }
