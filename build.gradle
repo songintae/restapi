@@ -42,7 +42,7 @@ asciidoctor {
 
 bootJar {
     dependsOn asciidoctor
-    from ("${asciidoctor.outputDir}/html5") {
+    from("${asciidoctor.outputDir}/html5") {
         into 'static/docs'
     }
 }
@@ -55,9 +55,10 @@ build {
 dependencies {
     asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.2.RELEASE'
     compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.1'
-    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-    implementation('org.springframework.boot:spring-boot-starter-hateoas')
-    implementation('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-security')
     runtimeOnly('com.h2database:h2')
     runtimeOnly('mysql:mysql-connector-java')
     compileOnly('org.projectlombok:lombok')

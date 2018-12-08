@@ -1,25 +1,26 @@
 package restapi.events;
 
 
-import org.apache.catalina.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import restapi.Account.Account;
 import restapi.Account.CurrentUser;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
@@ -41,7 +42,7 @@ public class EventController {
 
         eventDtoValidator.validate(eventDto, errors);
 
-        if(errors.hasErrors()) {
+        if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors);
         }
 
@@ -59,20 +60,19 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public ResponseEntity get(@CurrentUser Account currentUser, @PathVariable Integer eventId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(RuntimeException::new);
-        EventResource eventResource = new EventResource(event);
+    public ResponseEntity get(@CurrentUser Account currentUser, @PathVariable("eventId") Optional<Event> event) {
+        EventResource eventResource = new EventResource(event.orElseThrow(RuntimeException::new));
         eventResource.add(linkTo(EventController.class).withRel("events"));
         eventResource.add(new Link("/docs/index.html#resources-events-read").withRel("profile"));
 
-        if(currentUser != null) {
-            eventResource.add(linkTo(EventController.class).slash(event.getId()).withRel("update"));
+        if (currentUser != null) {
+            eventResource.add(linkTo(EventController.class).slash(event.get().getId()).withRel("update"));
         }
         return ResponseEntity.ok(eventResource);
     }
 
     @GetMapping("")
-    public ResponseEntity events(Pageable pageable
+    public ResponseEntity events(@PageableDefault Pageable pageable
             , PagedResourcesAssembler<Event> assembler) {
         Page<Event> page = eventRepository.findAll(pageable);
         PagedResources<EventResource> pagedResources =
@@ -86,11 +86,11 @@ public class EventController {
     public ResponseEntity update(@CurrentUser Account account, @PathVariable Integer eventId, @Valid @RequestBody EventDto eventDto, Errors errors) {
         eventDtoValidator.validate(eventDto, errors);
 
-        if(errors.hasErrors()) {
+        if (errors.hasErrors()) {
             return ResponseEntity.badRequest().body(errors);
         }
         Event findEvent = eventRepository.findById(eventId).get();
-        if(!findEvent.isPublisher(account)) {
+        if (!findEvent.isPublisher(account)) {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
 

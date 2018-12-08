@@ -1,7 +1,6 @@
 package restapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.h2.engine.User;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +19,6 @@ import restapi.common.BasicAuthConfig;
 import restapi.common.RestDocsConfig;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
@@ -194,7 +192,7 @@ public class EventControllerTest {
                                 linkWithRel("profile").description("link to profile")
                         ),
                         pathParameters(
-                          parameterWithName("eventId").description("조회 대상 Event Id")
+                                parameterWithName("eventId").description("조회 대상 Event Id")
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("name").description("Event 이름"),
@@ -205,7 +203,7 @@ public class EventControllerTest {
                                 fieldWithPath("free").description("Event 무료 여부"),
                                 fieldWithPath("online").description("Event 온라인 여부")))
                 )
-                ;
+        ;
     }
 
 
@@ -243,13 +241,13 @@ public class EventControllerTest {
 
         //when & then
         mockMvc.perform(put("/api/events/{eventId}", savedEvent.getId())
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .content(objectMapper.writeValueAsString(eventDto)))
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsString(eventDto)))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    public void Event_업데이트_BASIC_AUTH() throws Exception {
+    public void Event_업데이트() throws Exception {
         //given
         Event savedEvent = getEvent();
 
@@ -264,9 +262,9 @@ public class EventControllerTest {
 
         //when & then
         mockMvc.perform(put("/api/events/{eventId}", savedEvent.getId())
-                    .with(httpBasic(publisher.getEmail(), publisher.getPassword()))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(eventDto)))
+                .with(httpBasic(publisher.getEmail(), publisher.getPassword()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_links.self").hasJsonPath())
@@ -293,8 +291,8 @@ public class EventControllerTest {
         Account account = Account.builder()
                 .email("kookooku@woowahan.com")
                 .password("1234")
-                .roles(new HashSet<>(User.ROLE))
                 .build();
+        account.getRoles().add(Account.UserRole.USER);
 
         return accountRepository.save(account);
     }

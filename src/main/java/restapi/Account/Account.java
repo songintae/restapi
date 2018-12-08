@@ -1,7 +1,6 @@
 package restapi.Account;
 
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,13 +8,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 @EqualsAndHashCode(of = "id")
-@Getter @Setter @Builder
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Account {
 
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String email;
@@ -23,9 +26,10 @@ public class Account {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Set<UserRole> roles = new HashSet<>();
 
-    public enum  UserRole {
+    public enum UserRole {
 
         USER("USER"), ADMIN("ADMIN");
 

@@ -5,8 +5,11 @@ import lombok.*;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 
-@Getter @Setter
-@Builder @AllArgsConstructor @NoArgsConstructor
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class EventDto {
     @NotEmpty
     private String name;
@@ -15,5 +18,6 @@ public class EventDto {
     @NotEmpty
     private String location;
     private int price;
+    @Builder.Default
     private LocalDateTime date = LocalDateTime.now();
 }

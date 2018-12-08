@@ -1,5 +1,5 @@
 package restapi.events;
 
-public enum  EventStatus {
+public enum EventStatus {
     DRAFT, PUBLISHED, END;
 }

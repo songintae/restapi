@@ -1,6 +1,6 @@
 package restapi.common;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+import java.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +26,7 @@ public class BasicAuthConfig implements WebMvcConfigurer {
 
     @Autowired
     private CurrentUserMethodArgumentResolver resolver;
+
     @Bean
     public HandlerInterceptor basicAuthInterceptor() {
         return new HandlerInterceptor() {
@@ -33,12 +34,12 @@ public class BasicAuthConfig implements WebMvcConfigurer {
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
                 String authorization = request.getHeader("Authorization");
 
-                if(authorization == null || !authorization.startsWith("Basic"))
+                if (authorization == null || !authorization.startsWith("Basic"))
                     return true;
 
                 String base64Credential = authorization.substring("Basic".length()).trim();
 
-                String[] values = new String(Base64.decode(base64Credential), Charset.forName("UTF-8")).split(":");
+                String[] values = new String(Base64.getDecoder().decode(base64Credential), Charset.forName("UTF-8")).split(":");
                 Account account = accountRepository.findByEmailAndPassword(values[0], values[1]).get();
                 request.getSession().setAttribute("currentUser", account);
                 return true;
