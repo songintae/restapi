@@ -12,10 +12,12 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import restapi.Account.Account;
+import restapi.Account.AccountAdapter;
 import restapi.Account.CurrentUser;
 
 import javax.validation.Valid;

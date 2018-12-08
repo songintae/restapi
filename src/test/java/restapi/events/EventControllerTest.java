@@ -2,6 +2,7 @@ package restapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import restapi.Account.Account;
 import restapi.Account.AccountRepository;
-import restapi.common.BasicAuthConfig;
+import restapi.Account.AccountService;
 import restapi.common.RestDocsConfig;
 
 import java.time.LocalDateTime;
@@ -28,13 +29,14 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Import({RestDocsConfig.class, BasicAuthConfig.class})
+@Import({RestDocsConfig.class})
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 public class EventControllerTest {
@@ -55,11 +57,23 @@ public class EventControllerTest {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private AccountService accountService;
+
+    private Account account;
+
+
+    @Before
+    public void setUp() {
+       account = getAccount();
+    }
+
     @After
     public void tearDown() throws Exception {
         eventRepository.deleteAll();
         accountRepository.deleteAll();
     }
+
 
     @Test
     public void Event_생성_테스트() throws Exception {
@@ -74,6 +88,8 @@ public class EventControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/events")
+                .with(csrf())
+                .with(user(accountService.loadUserByUsername("kookooku@woowahan.com")))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
@@ -123,6 +139,8 @@ public class EventControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/events")
+                .with(csrf())
+                .with(user(accountService.loadUserByUsername("kookooku@woowahan.com")))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
@@ -156,6 +174,8 @@ public class EventControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/events")
+                .with(csrf())
+                .with(user(accountService.loadUserByUsername("kookooku@woowahan.com")))
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(objectMapper.writeValueAsString(event)))
                 .andDo(print())
@@ -262,7 +282,8 @@ public class EventControllerTest {
 
         //when & then
         mockMvc.perform(put("/api/events/{eventId}", savedEvent.getId())
-                .with(httpBasic(publisher.getEmail(), publisher.getPassword()))
+                .with(csrf())
+                .with(user(accountService.loadUserByUsername("kookooku@woowahan.com")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
@@ -280,7 +301,7 @@ public class EventControllerTest {
                 .location("korea")
                 .date(LocalDateTime.of(2019, 11, 10, 9, 30))
                 .price(0)
-                .publisher(getAccount())
+                .publisher(account)
                 .build();
 
         return eventRepository.save(event);
